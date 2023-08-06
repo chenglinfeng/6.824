@@ -236,6 +236,7 @@ func (sc *ShardCtrler) Query(args *QueryArgs, reply *QueryReply) {
 			reply.Err = ErrWrongLeader
 
 		} else {
+			sc.mu.Lock()
 			reply.Err = OK
 			sc.seqMap[op.ClientId] = op.SeqId
 			if op.QueryNum == -1 || op.QueryNum >= len(sc.configs) {
@@ -243,6 +244,7 @@ func (sc *ShardCtrler) Query(args *QueryArgs, reply *QueryReply) {
 			} else {
 				reply.Config = sc.configs[op.QueryNum]
 			}
+			sc.mu.Unlock()
 		}
 	case <-timer.C:
 		reply.Err = ErrWrongLeader
